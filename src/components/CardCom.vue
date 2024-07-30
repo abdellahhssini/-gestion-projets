@@ -14,6 +14,7 @@
 </template>
 <script>
 import CardName from "./CardName.vue"
+import { getAllCards, addCard, updateCard, deleteCard } from '../api/CardService';
 export default {
     name: 'CardCom',
     props: {
@@ -27,19 +28,43 @@ export default {
             cards: [],
         }
     },
+    async created(){
+        try {
+            this.cards = await getAllCards();
+        } catch (error){
+            console.error('Error in cards:',error);
+        }
+    },
     methods: {
-        addNewCard(card){
-            this.cards.push(card);
-        },
-        updateCard(cardID, event){
-            const cardin = this.cards.findIndex(card => card.id === cardID);
-            if(cardin !== -1){
-                this.cards.splice(cardin, 1, { ...this.cards[cardin], contenu: event.target.value });
-                console.log("Done",this.cards[cardin]);
+        async addNewCard(card){
+            try{
+                await addCard(card);
+                this.cards.push(card);
+            } catch (error){
+                console.error('Error adding card ',error);
             }
         },
-        deleteCard(cardId) {
-            this.cards = this.cards.filter(card => card.id !== cardId);
+        async updateCard(cardID, event){
+            const cardin = this.cards.findIndex(card => card.id === cardID);
+            if(cardin !== -1){
+                const updatedCard = { ...this.cards[cardin], contenu: event.target.value };
+                try {
+                    await updateCard(cardID, updatedCard);
+                    this.cards.splice(cardin, 1, updatedCard);
+                } catch(error){
+                    console.error('Error updating card ',error);
+                }
+            }
+        },
+        async deleteCard(cardId) {
+            try {
+                console.log(cardId, "is defined");
+                this.cards = this.cards.filter(card => card.id !== cardId);
+                await deleteCard(cardId);
+                
+            } catch (error){
+                console.error('Error deleting card ',error);
+            }
         }
     },
     components: {

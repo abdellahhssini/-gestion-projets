@@ -15,7 +15,7 @@ export default {
         newCard() {
             if (this.cardContenu.trim() !== ''){
                 const card = {
-                    id: Date.now(),
+                    id: '',
                     contenu: this.cardContenu, 
                 };
                 this.$emit('new-card',card);
